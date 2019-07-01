@@ -8,6 +8,7 @@ Created on Mon Jul  1 14:12:38 2019
 from keras import backend as K
 from keras import Model
 import keras
+import tensorflow as tf
 
 def get_vgg_loss_model():
     """ Gets VGG16 model and extract layers for the loss functions
@@ -43,9 +44,9 @@ def gram_matrix(input_tensor):
     channels = int(input_tensor.shape[3])
 #     total_size = int(input_tensor.shape[2])*int(input_tensor.shape[1])
     a = K.reshape(input_tensor, [K.shape(input_tensor)[0],-1, channels])
-    n = K.cast(K.shape(a)[1], K.float32) ## note: should this be set to trainable, false? Note: checked trainable, this is not one of them
-    gram = K.matmul(a, a, transpose_a=True) ### note: does this do the right matrix multiplication with a batch? I think it works
-    return gram / (n * K.cast(channels, K.float32))
+    n = K.cast(K.shape(a)[1], tf.float32) ## note: should this be set to trainable, false? Note: checked trainable, this is not one of them
+    gram = tf.matmul(a, a, transpose_a=True) ### note: does this do the right matrix multiplication with a batch? I think it works
+    return gram / (n * K.cast(channels, tf.float32))
 
 def get_gram_loss(style_feature, style_gram_target):
     """style_feature is a (batch, imx, imy, chan) tensor,
@@ -53,7 +54,7 @@ def get_gram_loss(style_feature, style_gram_target):
 
     style_gram = gram_matrix(style_feature) #gets a (batch, 64, 64 tensor)
 
-    return K.reduce_mean(K.square(style_gram - style_gram_target)) #this should broadcast appropriately
+    return tf.reduce_mean(tf.square(style_gram - style_gram_target)) #this should broadcast appropriately
 
 def get_style_loss(style_features, style_grams_target):
     
@@ -69,7 +70,7 @@ def get_style_loss(style_features, style_grams_target):
 
 def get_content_loss(content, target_content):
     """content is a [batch,imx,imy,chan] tensor, content is a [batch,imx,imy,chan] tensor"""
-    return K.reduce_mean(K.square(content - target_content))
+    return tf.reduce_mean(tf.square(content - target_content))
 
 
 

@@ -51,7 +51,7 @@ class StyleTransfer():
             self.style_weight = style_weight
             self.content_weight = content_weight
             
-            self.loss, self.cl, self.sl, get_loss_func(self.style_image, style_weight=style_weight, content_weight=content_weight)        
+            self.loss, self.cl, self.sl = get_loss_func(self.style_image, style_weight=style_weight, content_weight=content_weight)        
             
             if optimizer is None:
                 self.optimizer = optimizers.Adam
