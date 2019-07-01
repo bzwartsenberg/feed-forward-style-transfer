@@ -180,6 +180,7 @@ class StyleTransfer():
                     self.best_loss_epoch = j
                     self.best_loss_iter = i
                     self.generator.save(self.path + self.sub_path + 'best_checkpoint.h5', include_optimizer=False)        
+                self.write_json()
                     
                 
     def build_from_path(self, path):
