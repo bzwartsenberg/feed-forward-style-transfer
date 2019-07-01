@@ -13,40 +13,60 @@ import json
 from keras import layers
 from keras import Model
 from keras import optimizers
+from keras.models import load_model
 
 
 from losses import get_loss_func
-from custom_layers import InstanceNormalization, Conv2DReflect,residual_block
+from custom_layers import InstanceNormalization, Conv2DReflect,residual_block,ReflectionPadding2D
 from preprocessing import load_data,save_and_deprocess_img,load_and_process_img
 
 class StyleTransfer():
     
     def __init__(self, style_image_path, path, style_weight=1., content_weight=1., 
                  input_size=(256,256), optimizer=None, sub_path=None,
-                 test_photo_path=None):
-
-        self.style_image = load_and_process_img(style_image_path, resize=False)
-        
-        self.style_image_path = style_image_path
-        self.style_weight = style_weight
-        self.content_weight = content_weight
-        
-        self.loss, self.cl, self.sl, get_loss_func(self.style_image, style_weight=style_weight, content_weight=content_weight)        
-        self.build_generator_net(input_size=input_size)
-        
-        if optimizer is None:
-            self.optimizer = optimizers.Adam
-        else:
-            self.optimizer = optimizer
+                 test_photo_path=None, load_model=None, load_only=False):
+        """Style transfer class
+        Args:
+            style_image_path: path to style image
+            path: base path
+            style_weight: weight for the style loss
+            content_weight: weight for the content loss
+            input_size: size used for training
+            optimizer: pass a keras optimizer, Adam used standard
+            sub_path: sub path used for every model, automatically generated if not given
+            test_photo_path: a path to a folder of test photos to run on after training
+            load_model: path to a pretrained model
+            load_only: do not set up with a new directory for training, only prediction"""
             
-        self.path = path
-        
-        if sub_path is None:
-            i = 0
-            while os.path.exists(self.path + '{:05d}/'.format(i)):
-                i += 1
-            self.sub_path = '{:05d}/'.format(i)
-        self.test_photo_path = test_photo_path
+
+        if load_model is None:
+            self.build_generator_net(input_size=input_size)
+        else:
+            self.build_from_path(load_model)
+
+        if not load_only:
+            self.style_image = load_and_process_img(style_image_path, resize=False)
+            
+            self.style_image_path = style_image_path
+            self.style_weight = style_weight
+            self.content_weight = content_weight
+            
+            self.loss, self.cl, self.sl, get_loss_func(self.style_image, style_weight=style_weight, content_weight=content_weight)        
+            
+            if optimizer is None:
+                self.optimizer = optimizers.Adam
+            else:
+                self.optimizer = optimizer
+                
+            self.path = path
+            
+            if sub_path is None:
+                i = 0
+                while os.path.exists(self.path + '{:05d}/'.format(i)):
+                    i += 1
+                self.sub_path = '{:05d}/'.format(i)
+                os.mkdir(self.path + self.sub_path)
+            self.test_photo_path = test_photo_path
         
     
     
@@ -162,7 +182,11 @@ class StyleTransfer():
                     self.generator.save(self.path + self.sub_path + 'best_checkpoint.h5', include_optimizer=False)        
                     
                 
+    def build_from_path(self, path):
         
+        self.generator = load_model(path, custom_objects={'ReflectionPadding2D': ReflectionPadding2D,
+                                                          'InstanceNormalization': InstanceNormalization})
+
 
     def write_json(self):
         """Write a dictionary to be able to log training"""
