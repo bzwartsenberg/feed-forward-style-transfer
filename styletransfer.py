@@ -138,6 +138,7 @@ class StyleTransfer():
         self.batch_size = batch_size
         self.decay_lr = decay_lr
         self.chunk_size = chunk_size
+        self.save_checkpoint = save_checkpoint
         
         self.best_loss = np.inf
         self.best_cl = 0
