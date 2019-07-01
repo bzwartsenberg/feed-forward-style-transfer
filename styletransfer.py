@@ -18,7 +18,7 @@ from keras.models import load_model
 
 from losses import get_loss_func
 from custom_layers import InstanceNormalization, Conv2DReflect,residual_block,ReflectionPadding2D
-from preprocessing import load_data,save_and_deprocess_img,load_and_process_img
+from preprocessing import load_train_data,save_and_deprocess_img,load_and_process_img
 
 class StyleTransfer():
     
@@ -146,7 +146,7 @@ class StyleTransfer():
                 if verbose:
                     print('Iteration {} out of {}'.format(i, iterations))
                 
-                data = load_data(chunk_size, files = files[i*chunk_size:(i+1)*chunk_size])
+                data = load_train_data(chunk_size, files = files[i*chunk_size:(i+1)*chunk_size])
                 history = self.generator.fit(data, data, batch_size=batch_size, epochs=1, verbose=verbose)
                 
                 

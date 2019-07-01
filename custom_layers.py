@@ -9,8 +9,7 @@ Created on Mon Jul  1 14:07:31 2019
 from keras import backend as K
 from keras import layers
 from keras.layers import Layer
-
-
+import tensorflow as tf
 
 class ReflectionPadding2D(Layer):
     def __init__(self, padding=(1, 1), **kwargs):
@@ -20,11 +19,22 @@ class ReflectionPadding2D(Layer):
 
     def compute_output_shape(self, s):
         """ If you are using "channels_last" configuration"""
-        return (s[0], s[1] + 2 * self.padding[0], s[2] + 2 * self.padding[1], s[3])
+        o = [s[0]]
+        if s[1] is None:
+            o.append(s[1])
+        else:
+            o.append(s[1] + 2 * self.padding[0])
+        if s[2] is None:
+            o.append(s[2])
+        else:
+            o.append(s[2] + 2 * self.padding[1])
+        o.append(s[3])
+        
+        return tuple(o)
 
     def call(self, x, mask=None):
         w_pad,h_pad = self.padding
-        return K.pad(x, [[0,0], [h_pad,h_pad], [w_pad,w_pad], [0,0] ], 'REFLECT')
+        return tf.pad(x, [[0,0], [h_pad,h_pad], [w_pad,w_pad], [0,0] ], 'REFLECT')
     
 class InstanceNormalization(Layer):
 
