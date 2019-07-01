@@ -139,6 +139,12 @@ class StyleTransfer():
         self.decay_lr = decay_lr
         self.chunk_size = chunk_size
         
+        self.best_loss = np.inf
+        self.best_cl = 0
+        self.best_sl = 0
+        self.best_loss_epoch = 0
+        self.best_loss_iter = 0        
+        
         for j in range(epochs):
             self.generator.compile(loss = self.loss, optimizer = self.optimizer(decay_lr[j]), metrics = [self.cl, self.sl])
     
@@ -147,18 +153,12 @@ class StyleTransfer():
                     print('Iteration {} out of {}'.format(i, iterations))
                 
                 data = load_train_data(chunk_size, files = files[i*chunk_size:(i+1)*chunk_size])
-                history = self.generator.fit(data, data, batch_size=batch_size, epochs=1, verbose=verbose)
-                
+                history = self.generator.fit(data, data, batch_size=batch_size, epochs=1, verbose=verbose)                
                 
                 self.cl_history.append(history.history['cl'][0])
                 self.sl_history.append(history.history['sl'][0])
-                self.loss_history.append(history.history['loss'][0])
-                
-                self.best_loss = np.inf
-                self.best_cl = 0
-                self.best_sl
-                self.best_loss_epoch = 0
-                self.best_loss_iter = 0
+                self.loss_history.append(history.history['loss'][0])                
+
                     
                 if (i % 5) == 0 and save_img:
                     im_save_dir = self.path + self.sub_path + 'im_checkpoints/'
@@ -180,6 +180,7 @@ class StyleTransfer():
                     self.best_loss_epoch = j
                     self.best_loss_iter = i
                     self.generator.save(self.path + self.sub_path + 'best_checkpoint.h5', include_optimizer=False)        
+                    
                 self.write_json()
                     
                 
