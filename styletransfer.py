@@ -167,12 +167,13 @@ class StyleTransfer():
                         os.mkdir(im_save_dir)
                 
                     pred = self.generator.predict(data[0:1])
-                    save_and_deprocess_img(pred[0], 'pred_epoch_{}_iteration_{}.png'.format(j,i))
-                    save_and_deprocess_img(data[0], 'data_epoch_{}_iteration_{}.png'.format(j,i))
+                    save_and_deprocess_img(pred[0], self.path + self.sub_path + 'im_checkpoints/pred_epoch_{}_iteration_{}.png'.format(j,i))
+                    save_and_deprocess_img(data[0], self.path + self.sub_path + 'im_checkpoints/data_epoch_{}_iteration_{}.png'.format(j,i))
                     
                 
+                self.generator.save(self.path + self.sub_path + 'last_checkpoint_.h5', include_optimizer=False)        
                 if (i%save_checkpoint) == 0:
-                    self.generator.save(self.path + self.sub_path + 'checkpoint.h5', include_optimizer=False)        
+                    self.generator.save(self.path + self.sub_path + 'checkpoint_{:02d}.h5'.format(i), include_optimizer=False)        
                     
                 if save_best_loss and self.loss_history[-1] < self.best_loss:
                     self.best_loss = self.loss_history[-1]
