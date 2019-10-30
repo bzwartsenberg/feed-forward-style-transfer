@@ -13,3 +13,4 @@ Files:
  * **losses.py**: Implementation of the Gramm and content losses using VGG-19 network pretrained on imagenet
  * **preprocessing.py**: data preprocessing code, image scaling and loading.
  * **styletransfer.py**: StyleTransfer class implementing the network, training, and logging code.
+ * **feed_forward_neural_style_evaluate.ipynb**: Example of using a trained network to transform images
