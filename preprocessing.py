@@ -51,11 +51,12 @@ def load_img(path_to_img, resize = 256, crop = True):
         img = img.resize((round(img.size[0]*scale), round(img.size[1]*scale)), Image.ANTIALIAS)
         ## note: may need to crop instead of squeeze
         #crop:
+        
         if crop:
-            x_start = max(0, img.size[0]//2 - 128)
-            x_end = min(img.size[0], img.size[0]//2 + 128)
-            y_start = max(0, img.size[1]//2 - 128)
-            y_end = min(img.size[1], img.size[1]//2 + 128)
+            x_start = max(0, img.size[0]//2 - resize//2)
+            x_end = min(img.size[0], img.size[0]//2 + resize//2)
+            y_start = max(0, img.size[1]//2 - resize//2)
+            y_end = min(img.size[1], img.size[1]//2 + resize//2)
             img = img.crop([x_start, y_start, x_end, y_end])
         
     arr = kp_image.img_to_array(img)
